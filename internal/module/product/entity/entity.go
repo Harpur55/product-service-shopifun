@@ -17,7 +17,7 @@ type CreateProductResponse struct {
 }
 
 type GetProductRequest struct {
-	// ProductId string `validate:"uuid" db:"product_id"`
+	ProductId string `validate:"uuid" db:"product_id"`
 }
 
 type GetProductResponse struct {
@@ -29,8 +29,6 @@ type GetProductResponse struct {
 	Stock       int     `json:"stock"  db:"stock"`
 	Category    string  `json:"category" db:"category"`
 }
-
-
 
 type GetProductByidRequest struct {
 	ProductId string `validate:"uuid" db:"product_id"`
@@ -44,7 +42,7 @@ type GetProductByidResponse struct {
 	Category    string  `json:"category" db:"category"`
 }
 
-type UpdateProductRequest struct{
+type UpdateProductRequest struct {
 	ProductId string `validate:"uuid" db:"product_id"`
 
 	Name        string  `json:"name" validate:"required" db:"name"`
@@ -54,9 +52,9 @@ type UpdateProductRequest struct{
 	Stock       int     `json:"stock" validate:"required" db:"stock"`
 }
 type UpdateProductResponse struct {
-	 ProductId string `validate:"uuid" db:"product_id"`
+	ProductId string `validate:"uuid" db:"product_id"`
 }
 
-type DeleteProductRequest struct{
+type DeleteProductRequest struct {
 	ProductId string `validate:"uuid" db:"product_id"`
 }
