@@ -138,6 +138,48 @@ func (r *productRepository) DeleteProduct(ctx context.Context, req *entity.Delet
 
 	return nil
 }
+func (r *productRepository) SearchProduct(ctx context.Context, req *entity.SearchProductRequest) ([]entity.SearchProductResponse, error) {
+	var products []entity.SearchProductResponse
+
+	
+	query := `SELECT name, price, category FROM products WHERE 1=1`
+
+	
+	var args []interface{}
+
+	
+	if req.Name != "" {
+		query += ` AND name LIKE ?`
+		args = append(args, "%"+req.Name+"%")
+	}
+
+	
+	if req.Category != "" {
+		query += ` AND category = ?`
+		args = append(args, req.Category)
+	}
+
+	if req.PriceMin > 0 {
+		query += ` AND price >= ?`
+		args = append(args, req.PriceMin)
+	}
+	if req.PriceMax > 0 {
+		query += ` AND price <= ?`
+		args = append(args, req.PriceMax)
+	}
+
+	// Eksekusi query
+	err := r.db.SelectContext(ctx, &products, query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	
+	return products, nil
+}
+
+
+
 
 // func (r *shopRepository) UpdateShop(ctx context.Context, req *entity.UpdateShopRequest) (*entity.UpdateShopResponse, error) {
 // 	var resp = new(entity.UpdateShopResponse)

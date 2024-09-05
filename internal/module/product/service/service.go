@@ -39,6 +39,10 @@ func (s *productService) UpdateProduct(ctx context.Context, req *entity.UpdatePr
 func (s *productService) DeleteProduct(ctx context.Context, req *entity.DeleteProductRequest) error {
 	return s.repo.DeleteProduct(ctx, req)
 }
+func (s *productService) SearchProduct(ctx context.Context, req *entity.SearchProductRequest) ([]entity.SearchProductResponse, error) {
+	return s.repo.SearchProduct(ctx, req)
+}
+
 
 // func (s *shopService) UpdateShop(ctx context.Context, req *entity.UpdateShopRequest) (*entity.UpdateShopResponse, error) {
 // 	return s.repo.UpdateShop(ctx, req)

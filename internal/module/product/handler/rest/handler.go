@@ -9,6 +9,8 @@ import (
 	"codebase-app/internal/module/product/service"
 	"codebase-app/pkg/errmsg"
 	"codebase-app/pkg/response"
+	// "strings"
+	// "strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
@@ -34,9 +36,9 @@ func (h *productHandler) Register(router fiber.Router) {
 	router.Post("/product", middleware.ProductIdHeader, h.CreateProduct)
 	router.Get("/product", h.GetProduct)
 	router.Get("/product/:id", h.GetProductByid)
-	 router.Patch("/product/:id", middleware.ProductIdHeader, h.UpdateProduct)
+	router.Patch("/product/:id", middleware.ProductIdHeader, h.UpdateProduct)
 	router.Delete("/product/:id", middleware.ProductIdHeader, h.DeleteProduct)
-	
+	router.Get("/product/search", h.SearchProduct)
 }
 
 func (h *productHandler) CreateProduct(c *fiber.Ctx) error {
@@ -165,34 +167,34 @@ func (h *productHandler) UpdateProduct(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response.Success(resp, ""))
 }
 
-// func (h *shopHandler) GetShops(c *fiber.Ctx) error {
-// 	var (
-// 		req = new(entity.ShopsRequest)
-// 		ctx = c.Context()
-// 		v   = adapter.Adapters.Validator
-// 		l   = middleware.GetLocals(c)
-// 	)
+func (h *productHandler) SearchProduct(c *fiber.Ctx) error {
+	var (
+		req = new(entity.SearchProductRequest)
+		ctx = c.Context()
+		v   = adapter.Adapters.Validator
+	)
 
-// 	if err := c.QueryParser(req); err != nil {
-// 		log.Warn().Err(err).Msg("handler::GetShops - Parse request query")
-// 		return c.Status(fiber.StatusBadRequest).JSON(response.Error(err))
-// 	}
+	if err := c.BodyParser(req); err != nil {
+		log.Warn().Err(err).Msg("handler::SearchProduct - Failed to parse request body")
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("Invalid request body"))
+	}
 
-// 	req.UserId = l.UserId
-// 	req.SetDefault()
+	
+	if err := v.Validate(req); err != nil {
+		log.Warn().Err(err).Any("payload", req).Msg("handler::SearchProduct - Validate request body")
+		code, errs := errmsg.Errors(err, req)
+		return c.Status(code).JSON(response.Error(errs))
+	}
 
-// 	if err := v.Validate(req); err != nil {
-// 		log.Warn().Err(err).Any("payload", req).Msg("handler::GetShops - Validate request body")
-// 		code, errs := errmsg.Errors(err, req)
-// 		return c.Status(code).JSON(response.Error(errs))
-// 	}
+	
+	resp, err := h.service.SearchProduct(ctx, req)
+	if err != nil {
+		code, errs := errmsg.Errors[error](err)
+		return c.Status(code).JSON(response.Error(errs))
+	}
 
-// 	resp, err := h.service.GetShops(ctx, req)
-// 	if err != nil {
-// 		code, errs := errmsg.Errors[error](err)
-// 		return c.Status(code).JSON(response.Error(errs))
-// 	}
+	// Mengembalikan hasil pencarian
+	return c.Status(fiber.StatusOK).JSON(response.Success(resp, ""))
+}
 
-// 	return c.Status(fiber.StatusOK).JSON(response.Success(resp, ""))
 
-// }
